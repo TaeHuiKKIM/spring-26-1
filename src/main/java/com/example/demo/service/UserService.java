@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+
 import com.example.demo.domain.User;
 import com.example.demo.dto.UserDetailResponseDto;
 import com.example.demo.dto.UserSimpleResponseDto;
@@ -14,12 +15,18 @@ import java.util.List;
 
 @Service
 public class UserService {
+
 	private final UserRepository userRepository;
+	private final PostRepository postRepository;
+	private final ImageService imageService;
 
 	@Autowired
-	public UserService(UserRepository userRepository) {
+	public UserService(UserRepository userRepository, ImageService imageService,  PostRepository postRepository) {
 		this.userRepository = userRepository;
+		this.postRepository = postRepository;
+		this.imageService = imageService;
 	}
+
 
 	public UserSimpleResponseDto saveUser(User newUser) {
 		// 중복 회원 검증
@@ -30,7 +37,6 @@ public class UserService {
 		userRepository.save(newUser);
 		return convertUserToSimpleDto(newUser, newUser);
 	}
-
 
 	public List<UserSimpleResponseDto> getAllUsers(User currentUser) {
 		List<User> users = userRepository.findAll();
@@ -77,30 +83,39 @@ public class UserService {
 		return convertUserToDetailDto(currentUser, targetUser);
 	}
 
+
 	public UserDetailResponseDto convertUserToDetailDto(User currentUser, User targetUser) {
+		String imageUrl = targetUser.getImageUrl();
+		String imageData = imageService.encodeImageToBase64(System.getProperty("user.dir") + "/src/main/resources/static/" + imageUrl);
+
+
 		return new UserDetailResponseDto(
 				targetUser.getId(),
 				targetUser.getUsername(),
 				targetUser.getName(),
-				null,
+				imageData,
 				false,
 				targetUser.getBio(),
 				targetUser.getJoinedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm")),
-				0L,
+				postRepository.countByUser(targetUser),
 				0L,
 				0L
 		);
 	}
 
 
+
+
 	public UserSimpleResponseDto convertUserToSimpleDto(User currentUser, User targetUser) {
+		String imageUrl = targetUser.getImageUrl();
+		String imageData = imageService.encodeImageToBase64(System.getProperty("user.dir") + "/src/main/resources/static/" + imageUrl);
 
 		return new UserSimpleResponseDto(
 				targetUser.getId(),
 				targetUser.getUsername(),
 				targetUser.getName(),
-				null,
+				imageData,
 				false
-				);
+		);
 	}
 }
