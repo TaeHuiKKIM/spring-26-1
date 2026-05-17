@@ -5,6 +5,7 @@ import com.example.demo.domain.User;
 import com.example.demo.dto.UserDetailResponseDto;
 import com.example.demo.dto.UserSimpleResponseDto;
 import com.example.demo.dto.UserUpdateRequestDto;
+import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.domain.User;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,17 @@ public class ImageService {
 		userRepository.save(user);
 
 		return "userImages/" + uniqueImageName;
+	}
+
+	public String savePostImage(MultipartFile image) throws IOException {
+		String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
+		String uniqueImageName = timestamp + "_" + image.getOriginalFilename();
+
+		Path filePath = uploadDir.resolve("postImages").resolve(uniqueImageName);
+		Files.createDirectories(filePath.getParent());
+		image.transferTo(filePath.toFile());
+
+		return "postImages/" + uniqueImageName;
 	}
 
 	public String encodeImageToBase64(String imagePath) {
